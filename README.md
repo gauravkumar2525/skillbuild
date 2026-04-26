@@ -55,7 +55,7 @@ An end-to-end AI web application that analyses your CV against any job descripti
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/egwaojeangel/skillbridge-ai.git
+git clone https://github.com/gauravkumar2525/skillbuild.git
 cd skillbridge-ai
 ```
 
@@ -250,11 +250,6 @@ pip install -r requirements.txt
 
 ---
 
-## Author
-
-**Angel Egwaoje**
-
-Machine Learning Engineer | AI Applications & Full-Stack Development
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/angel-egwaoje-416927280)
 [![GitHub](https://img.shields.io/badge/GitHub-Follow-black?style=flat-square&logo=github)](https://github.com/egwaojeangel)

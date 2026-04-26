@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkillBridge | Interview</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg-deep:#0a0c10;--bg-card:rgba(23,28,38,0.7);--bg-card-solid:#111827;
+      --teal:#2dd4bf;--blue:#3b82f6;--teal-dim:rgba(45,212,191,0.1);--border:rgba(255,255,255,0.07);
+      --border-teal:rgba(45,212,191,0.25);--text:#f1f5f9;--text-muted:#94a3b8;--text-dim:#334155;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Plus Jakarta Sans',sans-serif;background-color:var(--bg-deep);color:var(--text);min-height:100vh;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
+    .glow-1{position:fixed;width:600px;height:600px;top:-200px;right:-100px;border-radius:50%;background:radial-gradient(circle, rgba(45,212,191,0.07) 0%, transparent 70%);pointer-events:none;z-index:0}
+    .glow-2{position:fixed;width:500px;height:500px;bottom:-150px;left:-100px;border-radius:50%;background:radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%);pointer-events:none;z-index:0}
+    .z{position:relative;z-index:1}
+    .glass{background:var(--bg-card);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:20px}
+    .btn{font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;border:none;cursor:pointer;border-radius:12px;transition:all 0.2s;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+    .btn-primary{background:linear-gradient(135deg,var(--teal),var(--blue));color:#fff;padding:12px 18px;font-size:14px;box-shadow:0 4px 24px rgba(45,212,191,0.2)}
+    .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 32px rgba(45,212,191,0.3);filter:brightness(1.05)}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:10px 16px;font-size:14px}
+    .btn-ghost:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-dim)}
+    .inp{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:12px;padding:13px 16px;color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;width:100%;outline:none;transition:border-color 0.2s, box-shadow 0.2s;resize:none}
+    .inp:focus{border-color:rgba(45,212,191,0.5);box-shadow:0 0 0 3px rgba(45,212,191,0.08)}
+    .lbl{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--text-muted);margin-bottom:6px}
+    .bdg{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.4px}
+    .bdg-teal{background:var(--teal-dim);color:var(--teal);border:1px solid var(--border-teal)}
+    .muted{color:var(--text-muted)}
+  </style>
+</head>
+<body>
+  <div class="glow-1"></div>
+  <div class="glow-2"></div>
+
+  <div class="z max-w-3xl mx-auto px-5 py-10">
+    <div class="mb-6 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,var(--teal),var(--blue))">
+          <i class="fas fa-bolt text-white text-sm"></i>
+        </div>
+        <div>
+          <div class="font-extrabold text-lg tracking-tight">Skill<span style="background:linear-gradient(135deg,var(--teal),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Bridge</span></div>
+          <div class="text-xs muted">Interview · answer honestly</div>
+        </div>
+      </div>
+      <button class="btn btn-ghost" onclick="goBack()"><i class="fas fa-arrow-left"></i> Back</button>
+    </div>
+
+    <div class="glass p-7">
+      <div id="loading" class="text-center py-10">
+        <div class="inline-flex items-center gap-3 px-4 py-2 rounded-full" style="background:rgba(255,255,255,0.04);border:1px solid var(--border)">
+          <i class="fas fa-spinner fa-spin" style="color:var(--teal)"></i>
+          <span class="text-sm font-semibold">Generating interview questions…</span>
+        </div>
+        <p class="text-sm muted mt-4">This is based on the job description you uploaded.</p>
+      </div>
+
+      <div id="main" class="hidden">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
+          <div class="flex items-center gap-2">
+            <span class="bdg bdg-teal"><i class="fas fa-message"></i> Conversation</span>
+            <span class="text-xs muted" id="qProgress">Question 1 / 10</span>
+          </div>
+          <span class="text-xs muted" id="skillTag"></span>
+        </div>
+
+        <div class="mb-4">
+          <div class="text-base font-bold leading-snug" id="questionText"></div>
+          <div class="text-xs muted mt-2" id="whyText"></div>
+        </div>
+
+        <div class="mb-6">
+          <label class="lbl">Your answer</label>
+          <textarea class="inp" id="answerBox" rows="7" placeholder="Type your answer here…"></textarea>
+          <p class="text-xs muted mt-2">Tip: explain your reasoning and any real examples.</p>
+        </div>
+
+        <div class="flex items-center justify-between gap-3">
+          <button class="btn btn-ghost" id="prevBtn" onclick="prevQ()"><i class="fas fa-arrow-left"></i> Previous</button>
+          <div class="flex items-center gap-3">
+            <button class="btn btn-ghost" id="skipBtn" onclick="skipQ()">Skip</button>
+            <button class="btn btn-primary" id="nextBtn" onclick="nextQ()"><i class="fas fa-arrow-right"></i> Next</button>
+            <button class="btn btn-primary hidden" id="submitBtn" onclick="submitAll()"><i class="fas fa-paper-plane"></i> Submit</button>
+          </div>
+        </div>
+
+        <div id="err" class="hidden mt-5 p-3 rounded-xl text-sm" style="background:rgba(239,68,68,0.10);border:1px solid rgba(239,68,68,0.2);color:#ef4444">
+          <i class="fas fa-exclamation-triangle mr-2"></i><span id="errMsg"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = (() => {
+      const h = window.location.hostname;
+      if (window.location.protocol === 'file:' || !h || h === 'localhost' || h === '127.0.0.1' || h === '::1') return 'http://localhost:5000';
+      return '';
+    })();
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('sid') || '';
+
+    let questions = [];
+    let idx = 0;
+    let answers = []; // { skill, question, answer, difficulty }
+
+    function showErr(m){
+      document.getElementById('errMsg').textContent = m;
+      document.getElementById('err').classList.remove('hidden');
+    }
+    function hideErr(){ document.getElementById('err').classList.add('hidden'); }
+
+    function goBack(){
+      if(sessionId) window.location.href = 'index.html?sid=' + encodeURIComponent(sessionId);
+      else window.location.href = 'index.html';
+    }
+
+    function syncAnswerFromUI(){
+      const text = document.getElementById('answerBox').value.trim();
+      const q = questions[idx];
+      answers[idx] = {
+        skill: q.skill || '',
+        question: q.question || '',
+        difficulty: q.difficulty || 'medium',
+        answer: text
+      };
+    }
+
+    function loadAnswerToUI(){
+      const a = answers[idx]?.answer || '';
+      document.getElementById('answerBox').value = a;
+    }
+
+    function render(){
+      const q = questions[idx];
+      document.getElementById('qProgress').textContent = `Question ${idx+1} / ${questions.length}`;
+      document.getElementById('skillTag').textContent = q.skill ? ('Skill: ' + q.skill) : '';
+      document.getElementById('questionText').textContent = q.question || '';
+      document.getElementById('whyText').textContent = q.why_this_matters ? ('Why: ' + q.why_this_matters) : '';
+
+      document.getElementById('prevBtn').disabled = idx === 0;
+      document.getElementById('prevBtn').style.opacity = idx === 0 ? '0.5' : '1';
+
+      const isLast = idx === questions.length - 1;
+      document.getElementById('nextBtn').classList.toggle('hidden', isLast);
+      document.getElementById('submitBtn').classList.toggle('hidden', !isLast);
+
+      loadAnswerToUI();
+    }
+
+    function prevQ(){
+      hideErr();
+      syncAnswerFromUI();
+      if(idx > 0){ idx--; render(); }
+    }
+
+    function nextQ(){
+      hideErr();
+      syncAnswerFromUI();
+      if(idx < questions.length - 1){ idx++; render(); }
+    }
+
+    function skipQ(){
+      hideErr();
+      document.getElementById('answerBox').value = '';
+      syncAnswerFromUI();
+      if(idx < questions.length - 1){ idx++; render(); }
+    }
+
+    async function submitAll(){
+      hideErr();
+      syncAnswerFromUI();
+
+      try{
+        const res = await fetch(API + '/api/session/answers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session_id: sessionId, answers })
+        });
+        const data = await res.json();
+        if(!res.ok || data.error) throw new Error(data.error || 'Server error');
+
+        // Immediately run analysis (JD + resume + interview answers)
+        const ar = await fetch(API + '/api/analyse_session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session_id: sessionId })
+        });
+        const ad = await ar.json();
+        if(!ar.ok || ad.error) throw new Error(ad.error || 'Server error');
+
+        // Hand off report to index.html for rendering
+        try { sessionStorage.setItem('sb_analysis_result', JSON.stringify(ad)); } catch(e) {}
+        window.location.href = 'index.html?sid=' + encodeURIComponent(sessionId) + '&autoview=1';
+      }catch(e){
+        showErr('Error: ' + e.message);
+      }
+    }
+
+    async function init(){
+      if(!sessionId){
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('main').classList.remove('hidden');
+        showErr('Missing session id. Start from the main page.');
+        return;
+      }
+
+      try{
+        const fd = new FormData();
+        fd.append('session_id', sessionId);
+        const res = await fetch(API + '/api/session/questions', { method: 'POST', body: fd });
+        const data = await res.json();
+        if(!res.ok || data.error) throw new Error(data.error || 'Server error');
+
+        questions = data.questions || [];
+        if(!questions.length) throw new Error('No questions returned.');
+
+        answers = new Array(questions.length).fill(null).map((_, i) => ({
+          skill: questions[i].skill || '',
+          question: questions[i].question || '',
+          difficulty: questions[i].difficulty || 'medium',
+          answer: ''
+        }));
+
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('main').classList.remove('hidden');
+        render();
+      }catch(e){
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('main').classList.remove('hidden');
+        showErr('Error: ' + e.message);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
+

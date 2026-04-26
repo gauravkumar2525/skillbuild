@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkillBridge | Career Gap Analyser</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #0a0c10;
+  --bg-card: rgba(23, 28, 38, 0.7);
+  --bg-card-solid: #111827;
+  --teal: #2dd4bf;
+  --blue: #3b82f6;
+  --teal-dim: rgba(45, 212, 191, 0.1);
+  --blue-dim: rgba(59, 130, 246, 0.1);
+  --green: #10b981;
+  --green-dim: rgba(16, 185, 129, 0.1);
+  --red: #ef4444;
+  --red-dim: rgba(239, 68, 68, 0.1);
+  --border: rgba(255,255,255,0.07);
+  --border-teal: rgba(45,212,191,0.25);
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --text-dim: #334155;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: var(--bg-deep);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Grain */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9999;
+}
+
+/* Background glow blobs */
+.glow-1 { position: fixed; width: 600px; height: 600px; top: -200px; right: -100px; border-radius: 50%; background: radial-gradient(circle, rgba(45,212,191,0.07) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+.glow-2 { position: fixed; width: 500px; height: 500px; bottom: -150px; left: -100px; border-radius: 50%; background: radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+
+.z { position: relative; z-index: 1; }
+
+/* Glass */
+.glass {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+}
+.glass-solid {
+  background: var(--bg-card-solid);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+}
+
+/* Pages */
+.pg { display: none; }
+.pg.on { display: block; animation: fadeUp 0.4s ease-out; }
+.pg-center { display: none; }
+.pg-center.on { display: flex; animation: fadeUp 0.4s ease-out; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes scanLine {
+  0% { top: 0%; opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+@keyframes slideIn {
+  from { transform: translateX(400px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes barGrow {
+  from { width: 0%; }
+}
+@keyframes countUp {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Gradient text */
+.grad-text {
+  background: linear-gradient(135deg, var(--teal) 0%, var(--blue) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Nav */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,12,16,0.9);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Buttons */
+.btn {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600;
+  border: none; cursor: pointer;
+  border-radius: 12px;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--teal), var(--blue));
+  color: #fff;
+  padding: 14px 28px;
+  font-size: 15px;
+  box-shadow: 0 4px 24px rgba(45,212,191,0.2);
+}
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(45,212,191,0.3); filter: brightness(1.05); }
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 10px 20px;
+  font-size: 14px;
+}
+.btn-ghost:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-dim); }
+.btn-sm { padding: 8px 16px; font-size: 13px; }
+
+/* Inputs */
+.inp {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 13px 16px;
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  resize: none;
+}
+.inp:focus { border-color: rgba(45,212,191,0.5); box-shadow: 0 0 0 3px rgba(45,212,191,0.08); }
+.inp::placeholder { color: var(--text-dim); }
+
+.lbl {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+/* Tabs */
+.tab {
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--text-muted);
+  border: none;
+  background: transparent;
+}
+.tab.on { background: var(--teal-dim); color: var(--teal); }
+.tab:not(.on):hover { color: var(--text); background: rgba(255,255,255,0.05); }
+
+/* Badges */
+.bdg {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 99px;
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.bdg-teal { background: var(--teal-dim); color: var(--teal); }
+.bdg-blue { background: var(--blue-dim); color: var(--blue); }
+.bdg-green { background: var(--green-dim); color: var(--green); }
+.bdg-red { background: var(--red-dim); color: var(--red); }
+.bdg-gray { background: rgba(255,255,255,0.06); color: var(--text-muted); }
+
+/* Drop zone */
+.drop {
+  border: 2px dashed var(--border);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.02);
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.drop:hover, .drop.drag {
+  border-color: var(--teal);
+  background: var(--teal-dim);
+}
+
+/* Skill bar */
+.bar-track { background: rgba(255,255,255,0.06); border-radius: 99px; height: 6px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--teal), var(--blue)); transition: width 1.2s cubic-bezier(0.22,1,0.36,1); }
+
+/* Match ring */
+.ring-svg { transform: rotate(-90deg); }
+.ring-circle { stroke-dasharray: 251; stroke-dashoffset: 251; transition: stroke-dashoffset 1.5s cubic-bezier(0.22,1,0.36,1); }
+
+/* Timeline */
+.tl-line { position: absolute; left: 17px; top: 36px; bottom: 0; width: 2px; background: linear-gradient(to bottom, var(--teal), var(--blue), transparent); }
+.tl-dot { width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--teal); background: var(--bg-card-solid); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--teal); flex-shrink: 0; position: relative; z-index: 1; }
+
+/* Spinner */
+.spinner { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(45,212,191,0.2); border-top-color: var(--teal); animation: spin 0.7s linear infinite; }
+
+/* Password strength */
+.pw-bar { height: 3px; border-radius: 99px; transition: all 0.3s; background: rgba(255,255,255,0.08); }
+
+/* Toggle */
+.tog { width: 46px; height: 24px; background: rgba(255,255,255,0.08); border: 1px solid var(--border); border-radius: 99px; cursor: pointer; position: relative; transition: all 0.3s; }
+.tog-t { position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; border-radius: 50%; background: linear-gradient(135deg, var(--teal), var(--blue)); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); display: flex; align-items: center; justify-content: center; font-size: 8px; color: #fff; }
+.tog.light .tog-t { transform: translateX(22px); }
+
+/* Divider */
+.divl { height: 1px; background: var(--border); margin: 20px 0; }
+
+/* Section header */
+.sec-h { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 700; margin-bottom: 18px; }
+.sec-ic { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+
+/* Notification */
+.notif {
+  position: fixed; top: 20px; right: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-teal);
+  border-radius: 14px;
+  padding: 14px 20px;
+  z-index: 9999;
+  animation: slideIn 0.3s ease-out;
+  backdrop-filter: blur(12px);
+  max-width: 320px;
+}
+
+/* Mobile nav */
+.mob-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(10,12,16,0.95); border-top: 1px solid var(--border); z-index: 100; padding: 10px 0 max(10px,env(safe-area-inset-bottom)); backdrop-filter: blur(20px); }
+@media(max-width:768px) { .mob-nav { display: flex; } .dsk { display: none !important; } body { padding-bottom: 68px; } }
+
+/* Scan line animation for loading */
+.scan-line { height: 2px; background: var(--teal); box-shadow: 0 0 20px var(--teal); position: absolute; width: 100%; animation: scanLine 2s infinite ease-in-out; }
+
+/* CV tip */
+.cv-tip { display: flex; gap: 12px; padding: 14px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-left: 3px solid var(--teal); transition: border-color 0.2s; }
+.cv-tip:hover { border-left-color: var(--blue); background: rgba(255,255,255,0.05); }
+
+/* Imp badges */
+.imp-c { background: var(--red-dim); color: var(--red); }
+.imp-i { background: var(--blue-dim); color: var(--blue); }
+.imp-n { background: var(--green-dim); color: var(--green); }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ══════════════════════════════════════════
+   LIGHT MODE — Full Override
+══════════════════════════════════════════ */
+body.light {
+  --bg-deep: #f0f9ff;
+  --bg-card: rgba(255,255,255,0.95);
+  --bg-card-solid: #ffffff;
+  --teal: #0d9488;
+  --blue: #2563eb;
+  --teal-dim: rgba(13,148,136,0.10);
+  --blue-dim: rgba(37,99,235,0.10);
+  --green: #059669;
+  --green-dim: rgba(5,150,105,0.10);
+  --red: #dc2626;
+  --red-dim: rgba(220,38,38,0.10);
+  --border: rgba(0,0,0,0.08);
+  --border-teal: rgba(13,148,136,0.28);
+  --text: #0f172a;
+  --text-muted: #475569;
+  --text-dim: #94a3b8;
+  background: linear-gradient(150deg, #e0f2fe 0%, #f8fafc 40%, #ecfdf5 100%) !important;
+  color: #0f172a !important;
+}
+
+body.light .nav {
+  background: rgba(255,255,255,0.92) !important;
+  border-bottom: 1px solid rgba(0,0,0,0.07) !important;
+  box-shadow: 0 1px 12px rgba(0,0,0,0.06);
+}
+
+body.light .glass {
+  background: rgba(255,255,255,0.92) !important;
+  border: 1px solid rgba(0,0,0,0.07) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04) !important;
+}
+
+body.light .glass-solid {
+  background: #ffffff !important;
+  border: 1px solid rgba(0,0,0,0.07) !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06) !important;
+}
+
+body.light .inp {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+body.light .inp::placeholder { color: #94a3b8 !important; }
+
+body.light .inp:focus {
+  background: #fff !important;
+  border-color: rgba(13,148,136,0.55) !important;
+  box-shadow: 0 0 0 3px rgba(13,148,136,0.10) !important;
+}
+
+body.light .bar-track { background: #e2e8f0 !important; }
+
+body.light .tl-dot { background: #ffffff !important; }
+
+body.light .tl-line {
+  background: linear-gradient(to bottom, #0d9488, #2563eb, transparent) !important;
+}
+
+body.light .mob-nav {
+  background: rgba(255,255,255,0.97) !important;
+  border-top: 1px solid rgba(0,0,0,0.08) !important;
+}
+
+body.light .tab:not(.on):hover {
+  background: rgba(0,0,0,0.04) !important;
+  color: #0f172a !important;
+}
+
+body.light .tab.on {
+  background: rgba(13,148,136,0.12) !important;
+  color: #0d9488 !important;
+}
+
+body.light .tog {
+  background: rgba(0,0,0,0.07) !important;
+  border-color: rgba(0,0,0,0.12) !important;
+}
+
+body.light .btn-ghost {
+  border-color: rgba(0,0,0,0.14) !important;
+  color: #475569 !important;
+}
+
+body.light .btn-ghost:hover {
+  border-color: #0d9488 !important;
+  color: #0d9488 !important;
+  background: rgba(13,148,136,0.08) !important;
+}
+
+body.light .divl { background: #e2e8f0 !important; }
+
+body.light .pw-bar { background: #e2e8f0 !important; }
+
+body.light .drop {
+  background: #f8fafc !important;
+  border: 2px dashed #cbd5e1 !important;
+}
+
+body.light .drop:hover, body.light .drop.drag {
+  background: rgba(13,148,136,0.06) !important;
+  border-color: #0d9488 !important;
+}
+
+body.light .cv-tip {
+  background: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+body.light .cv-tip:hover { background: #f1f5f9 !important; }
+
+body.light .bdg-gray {
+  background: rgba(0,0,0,0.06) !important;
+  color: #475569 !important;
+}
+
+body.light .notif {
+  background: rgba(255,255,255,0.97) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10) !important;
+}
+
+body.light .glow-1 {
+  background: radial-gradient(circle, rgba(13,148,136,0.15) 0%, transparent 70%) !important;
+}
+
+body.light .glow-2 {
+  background: radial-gradient(circle, rgba(37,99,235,0.12) 0%, transparent 70%) !important;
+}
+
+body.light ::-webkit-scrollbar-thumb { background: #cbd5e1; }
+
+/* Inline-style bg overrides for result cards in light mode */
+body.light [style*="background:rgba(255,255,255,0.03)"],
+body.light [style*="background:rgba(255,255,255,0.04)"],
+body.light [style*="background:rgba(255,255,255,0.05)"],
+body.light [style*="background:rgba(255,255,255,0.06)"] {
+  background: rgba(0,0,0,0.03) !important;
+}
+
+body.light [style*="border:1px solid var(--border)"] {
+  border-color: rgba(0,0,0,0.08) !important;
+}
+
+body.light .scan-line {
+  background: #0d9488 !important;
+  box-shadow: 0 0 20px #0d9488 !important;
+}
+
+body.light .spinner {
+  border: 2px solid rgba(13,148,136,0.18) !important;
+  border-top-color: #0d9488 !important;
+}
+</style>
+</head>
+<body>
+<div class="glow-1"></div>
+<div class="glow-2"></div>
+
+<!-- ═══════ NAVBAR ═══════ -->
+<nav class="nav z">
+  <div class="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-3 cursor-pointer" onclick="goHome()">
+      <div class="w-8 h-8 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,var(--teal),var(--blue))">
+        <i class="fas fa-bolt text-white text-sm"></i>
+      </div>
+      <span class="font-extrabold text-lg tracking-tight">Skill<span class="grad-text">Bridge</span></span>
+    </div>
+
+    <div class="dsk hidden md:flex items-center gap-1">
+      <button class="tab on" id="nt-home" onclick="goHome()">Analyse</button>
+      <button class="tab" id="nt-results" onclick="showPg('results')" style="display:none">Results</button>
+      <button class="tab" id="nt-how" onclick="showPg('how')">How it works</button>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <div class="tog" id="tog" onclick="toggleTheme()">
+        <div class="tog-t"><i class="fas fa-moon text-white" id="ti" style="font-size:8px"></i></div>
+      </div>
+      <div id="nav-user" class="hidden items-center gap-2">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold" style="background:linear-gradient(135deg,var(--teal),var(--blue));color:#fff" id="nav-av">A</div>
+        <button class="btn btn-ghost btn-sm" onclick="logout()">Sign out</button>
+      </div>
+      <div id="nav-auth" class="flex items-center gap-2">
+        <button class="btn btn-ghost btn-sm" onclick="showPg('login')">Sign in</button>
+        <button class="btn btn-primary btn-sm" onclick="showPg('register')">Get started</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════ LOGIN ═══════ -->
+<div id="pg-login" class="pg-center z min-h-screen items-center justify-center px-4 py-16" style="background:radial-gradient(circle at top right, rgba(45,212,191,0.05) 0%, transparent 50%)">
+  <div class="w-full max-w-md">
+    <div class="glass p-10 relative overflow-hidden">
+      <!-- Top accent line -->
+      <div class="absolute top-0 left-0 right-0 h-px" style="background:linear-gradient(90deg,var(--teal),var(--blue))"></div>
+
+      <div class="text-center mb-10">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6" style="background:var(--teal-dim);border:1px solid var(--border-teal)">
+          <i class="fas fa-bolt text-3xl" style="color:var(--teal)"></i>
+        </div>
+        <h1 class="text-3xl font-bold tracking-tight">Welcome <span class="grad-text">back</span></h1>
+        <p class="text-sm mt-2" style="color:var(--text-muted)">Sign in to your SkillBridge account</p>
+      </div>
+
+      <div class="space-y-5">
+        <div><label class="lbl">Email address</label><input class="inp" type="email" id="l-em" placeholder="you@example.com"></div>
+        <div>
+          <label class="lbl">Password</label>
+          <div class="relative">
+            <input class="inp" type="password" id="l-pw" placeholder="••••••••" style="padding-right:44px">
+            <button type="button" onclick="togglePw('l-pw','l-eye')" class="absolute right-3 top-1/2 -translate-y-1/2" style="color:var(--text-muted);background:none;border:none;cursor:pointer;font-size:14px"><i class="fas fa-eye" id="l-eye"></i></button>
+          </div>
+        </div>
+        <div id="l-err" class="hidden p-3 rounded-xl text-sm" style="background:var(--red-dim);color:var(--red);border:1px solid rgba(239,68,68,0.2)"></div>
+        <button class="btn btn-primary w-full" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Sign in</button>
+      </div>
+
+      <div class="divl"></div>
+      <p class="text-center text-sm" style="color:var(--text-muted)">
+        No account? <button onclick="showPg('register')" style="color:var(--teal);background:none;border:none;cursor:pointer;font-weight:600;font-family:inherit">Create one free</button>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ REGISTER ═══════ -->
+<div id="pg-register" class="pg-center z min-h-screen items-center justify-center px-4 py-16" style="background:radial-gradient(circle at top left, rgba(59,130,246,0.05) 0%, transparent 50%)">
+  <div class="w-full max-w-md">
+    <div class="glass p-10 relative overflow-hidden">
+      <div class="absolute top-0 left-0 right-0 h-px" style="background:linear-gradient(90deg,var(--blue),var(--teal))"></div>
+
+      <div class="text-center mb-10">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6" style="background:var(--blue-dim);border:1px solid rgba(59,130,246,0.25)">
+          <i class="fas fa-user-plus text-3xl" style="color:var(--blue)"></i>
+        </div>
+        <h1 class="text-3xl font-bold tracking-tight">Create <span class="grad-text">account</span></h1>
+        <p class="text-sm mt-2" style="color:var(--text-muted)">Start bridging your career gaps today</p>
+      </div>
+
+      <div class="space-y-5">
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="lbl">First name</label><input class="inp" type="text" id="r-fn" placeholder="Angel"></div>
+          <div><label class="lbl">Last name</label><input class="inp" type="text" id="r-ln" placeholder="Egwaoje"></div>
+        </div>
+        <div><label class="lbl">Email address</label><input class="inp" type="email" id="r-em" placeholder="you@example.com"></div>
+        <div>
+          <label class="lbl">Password</label>
+          <div class="relative">
+            <input class="inp" type="password" id="r-pw" placeholder="Min. 8 characters" style="padding-right:44px" oninput="checkPw(this.value)">
+            <button type="button" onclick="togglePw('r-pw','r-eye')" class="absolute right-3 top-1/2 -translate-y-1/2" style="color:var(--text-muted);background:none;border:none;cursor:pointer;font-size:14px"><i class="fas fa-eye" id="r-eye"></i></button>
+          </div>
+          <div class="flex gap-1 mt-2">
+            <div class="pw-bar flex-1" id="pw1"></div><div class="pw-bar flex-1" id="pw2"></div>
+            <div class="pw-bar flex-1" id="pw3"></div><div class="pw-bar flex-1" id="pw4"></div>
+          </div>
+          <p class="text-xs mt-1" id="pwl" style="color:var(--text-muted)"></p>
+        </div>
+        <div><label class="lbl">Confirm password</label><input class="inp" type="password" id="r-pw2" placeholder="••••••••"></div>
+        <div id="r-err" class="hidden p-3 rounded-xl text-sm" style="background:var(--red-dim);color:var(--red);border:1px solid rgba(239,68,68,0.2)"></div>
+        <button class="btn btn-primary w-full" onclick="doRegister()"><i class="fas fa-user-plus"></i> Create account</button>
+      </div>
+
+      <div class="divl"></div>
+      <p class="text-center text-sm" style="color:var(--text-muted)">
+        Already have an account? <button onclick="showPg('login')" style="color:var(--teal);background:none;border:none;cursor:pointer;font-weight:600;font-family:inherit">Sign in</button>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ HOME ═══════ -->
+<div id="pg-home" class="pg on z">
+  <div class="max-w-6xl mx-auto px-5 py-14">
+
+    <!-- Hero -->
+    <div class="text-center mb-14" style="max-width:680px;margin-left:auto;margin-right:auto">
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6" style="background:var(--teal-dim);border:1px solid var(--border-teal)">
+        <span class="w-1.5 h-1.5 rounded-full" style="background:var(--teal);animation:pulse 2s infinite"></span>
+        <span class="text-xs font-semibold tracking-wide" style="color:var(--teal)">Any industry · Any role · Instant AI analysis</span>
+      </div>
+      <h1 class="font-extrabold mb-5" style="font-size:clamp(2.2rem,5vw,3.5rem);letter-spacing:-1.5px;line-height:1.1">
+        Know exactly what's standing between you and your <span class="grad-text">dream job</span>
+      </h1>
+      <p class="text-base leading-relaxed" style="color:var(--text-muted)">
+        Upload your CV and paste any job description. Get an honest skill gap analysis, personalised learning roadmap, salary insights, career advice, and tips to strengthen your CV — for <strong style="color:var(--text)">any role in any industry.</strong>
+      </p>
+    </div>
+
+    <!-- Form -->
+    <div class="glass p-8 max-w-2xl mx-auto" style="box-shadow:0 0 80px rgba(45,212,191,0.06)">
+      <!-- CV tabs -->
+      <div class="flex gap-1 p-1 rounded-xl mb-6" style="background:rgba(255,255,255,0.04)">
+        <button class="tab on flex-1" id="t-up" onclick="swTab('up')"><i class="fas fa-upload mr-2"></i>Upload CV</button>
+        <button class="tab flex-1" id="t-paste" onclick="swTab('paste')"><i class="fas fa-paste mr-2"></i>Paste text</button>
+      </div>
+
+      <!-- Upload -->
+      <div id="s-up" class="mb-6">
+        <div class="drop p-10 text-center" id="dz"
+             ondragover="event.preventDefault();this.classList.add('drag')"
+             ondragleave="this.classList.remove('drag')"
+             ondrop="handleDrop(event)"
+             onclick="document.getElementById('cf').click()">
+          <input type="file" id="cf" accept=".pdf,.doc,.docx,.txt" class="hidden" onchange="handleFile(event)">
+          <div id="dz-def">
+            <div class="w-14 h-14 rounded-2xl mx-auto mb-4 flex items-center justify-center" style="background:var(--teal-dim);border:1px solid var(--border-teal)">
+              <i class="fas fa-file-arrow-up text-xl" style="color:var(--teal)"></i>
+            </div>
+            <p class="font-semibold text-lg mb-1">Drop your CV here</p>
+            <p class="text-sm" style="color:var(--text-muted)">PDF, DOC, DOCX or TXT · Max 5MB</p>
+            <div class="flex items-center gap-3 my-4 max-w-xs mx-auto">
+              <div class="flex-1" style="height:1px;background:var(--border)"></div>
+              <span class="text-xs" style="color:var(--text-dim)">or</span>
+              <div class="flex-1" style="height:1px;background:var(--border)"></div>
+            </div>
+            <button class="btn btn-ghost btn-sm">Browse files</button>
+          </div>
+          <div id="dz-done" class="hidden">
+            <div class="w-14 h-14 rounded-2xl mx-auto mb-3 flex items-center justify-center" style="background:var(--green-dim)">
+              <i class="fas fa-check text-xl" style="color:var(--green)"></i>
+            </div>
+            <p class="font-bold" style="color:var(--green)" id="fn">file.pdf</p>
+            <p class="text-sm mt-1" style="color:var(--text-muted)" id="fs">Ready</p>
+            <button class="btn btn-ghost btn-sm mt-3" onclick="clearFile(event)"><i class="fas fa-times mr-1"></i>Remove</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Paste -->
+      <div id="s-paste" class="hidden mb-6">
+        <label class="lbl">Your CV text</label>
+        <textarea class="inp" id="cv-txt" rows="8" placeholder="Paste your full CV here — work experience, skills, education, certifications..."></textarea>
+      </div>
+
+      <div class="divl" style="margin:0 0 20px"></div>
+
+      <div class="mb-4">
+        <label class="lbl">Job title <span style="text-transform:none;font-size:11px;letter-spacing:0;color:var(--text-dim)">(optional if you paste the full JD)</span></label>
+        <input class="inp" id="jt" placeholder="e.g. ICU Nurse, Product Manager, Tax Lawyer, UX Designer, Civil Engineer...">
+      </div>
+      <div class="mb-6">
+        <label class="lbl">Job description <span style="text-transform:none;font-size:11px;letter-spacing:0;color:var(--text-dim)">(paste full JD for best results)</span></label>
+        <textarea class="inp" id="jd" rows="6" placeholder="Paste the full job description here — responsibilities, requirements, qualifications..."></textarea>
+      </div>
+
+      <button class="btn btn-primary w-full text-base" id="cb" onclick="startConversation()">
+        <i class="fas fa-message"></i> Bring the conversation
+      </button>
+
+      <button class="btn btn-primary w-full text-base hidden mt-3" id="ab" onclick="runAnalysis()">
+        <i class="fas fa-bolt"></i> Analyse My Career Gap
+      </button>
+
+      <div id="err" class="hidden mt-4 p-3 rounded-xl text-sm" style="background:var(--red-dim);border:1px solid rgba(239,68,68,0.2);color:var(--red)">
+        <i class="fas fa-exclamation-triangle mr-2"></i><span id="em"></span>
+      </div>
+    </div>
+
+    <!-- Feature chips -->
+    <div class="flex flex-wrap justify-center gap-3 mt-10">
+      <div class="flex items-center gap-2 px-4 py-2 rounded-full" style="background:rgba(255,255,255,0.04);border:1px solid var(--border)"><i class="fas fa-briefcase text-xs" style="color:var(--teal)"></i><span class="text-sm" style="color:var(--text-muted)">Any industry</span></div>
+      <div class="flex items-center gap-2 px-4 py-2 rounded-full" style="background:rgba(255,255,255,0.04);border:1px solid var(--border)"><i class="fas fa-map text-xs" style="color:var(--blue)"></i><span class="text-sm" style="color:var(--text-muted)">Learning roadmap</span></div>
+      <div class="flex items-center gap-2 px-4 py-2 rounded-full" style="background:rgba(255,255,255,0.04);border:1px solid var(--border)"><i class="fas fa-coins text-xs" style="color:var(--green)"></i><span class="text-sm" style="color:var(--text-muted)">Salary insights</span></div>
+      <div class="flex items-center gap-2 px-4 py-2 rounded-full" style="background:rgba(255,255,255,0.04);border:1px solid var(--border)"><i class="fas fa-file-pen text-xs" style="color:var(--teal)"></i><span class="text-sm" style="color:var(--text-muted)">CV improvement tips</span></div>
+      <div class="flex items-center gap-2 px-4 py-2 rounded-full" style="background:rgba(255,255,255,0.04);border:1px solid var(--border)"><i class="fas fa-code-branch text-xs" style="color:var(--blue)"></i><span class="text-sm" style="color:var(--text-muted)">Alternative roles</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ LOADING ═══════ -->
+<div id="pg-loading" class="pg-center z min-h-screen items-center justify-center px-4">
+  <div class="text-center max-w-md">
+    <div class="relative w-24 h-24 mx-auto mb-8">
+      <div class="w-24 h-24 rounded-2xl flex items-center justify-center mx-auto" style="background:linear-gradient(135deg,var(--teal),var(--blue));animation:pulse 2s infinite">
+        <i class="fas fa-bolt text-white text-4xl"></i>
+      </div>
+    </div>
+    <h2 class="font-bold text-3xl mb-3 tracking-tight">Analysing your profile</h2>
+    <p class="mb-10" style="color:var(--text-muted)">This takes about 15–20 seconds...</p>
+    <div class="glass p-4 text-left relative overflow-hidden" style="max-width:360px;margin:0 auto">
+      <div class="scan-line"></div>
+      <div class="flex items-center gap-3">
+        <div class="spinner flex-shrink-0"></div>
+        <span class="text-sm font-medium" id="ls">Parsing your CV...</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ RESULTS ═══════ -->
+<div id="pg-results" class="pg z">
+  <div class="max-w-6xl mx-auto px-5 py-10" id="rc"></div>
+</div>
+
+<!-- ═══════ HOW IT WORKS ═══════ -->
+<div id="pg-how" class="pg z">
+  <div class="max-w-4xl mx-auto px-5 py-20">
+    <div class="text-center mb-14">
+      <h2 class="font-bold text-4xl mb-4 tracking-tight">How <span class="grad-text">SkillBridge</span> works</h2>
+      <p style="color:var(--text-muted)">A quick interview-first check of your real skill level</p>
+    </div>
+    <div class="grid sm:grid-cols-4 gap-5 mb-12">
+      <div class="glass p-7 text-center">
+        <div class="text-4xl mb-4">📄</div>
+        <h3 class="font-bold text-lg mb-2">Upload resume</h3>
+        <p class="text-sm leading-relaxed" style="color:var(--text-muted)">Upload PDF/Word/TXT or paste your resume text.</p>
+      </div>
+      <div class="glass p-7 text-center">
+        <div class="text-4xl mb-4">🎯</div>
+        <h3 class="font-bold text-lg mb-2">Add the job</h3>
+        <p class="text-sm leading-relaxed" style="color:var(--text-muted)">Paste the job description (and title). Skills are extracted only from the JD.</p>
+      </div>
+      <div class="glass p-7 text-center">
+        <div class="text-4xl mb-4">💬</div>
+        <h3 class="font-bold text-lg mb-2">Bring the conversation</h3>
+        <p class="text-sm leading-relaxed" style="color:var(--text-muted)">Answer interview questions one-by-one. Each answer is scored using a 100-point rubric.</p>
+      </div>
+      <div class="glass p-7 text-center">
+        <div class="text-4xl mb-4">🗺️</div>
+        <h3 class="font-bold text-lg mb-2">See strengths, gaps & plan</h3>
+        <p class="text-sm leading-relaxed" style="color:var(--text-muted)">Every required JD skill appears in strengths or gaps, with a week-by-week roadmap for each gap.</p>
+      </div>
+    </div>
+    <div class="text-center">
+      <button class="btn btn-primary" onclick="goHome()"><i class="fas fa-bolt"></i> Try it now — it's free</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ MOBILE NAV ═══════ -->
+<nav class="mob-nav z">
+  <div class="flex items-center justify-around w-full px-6">
+    <button class="flex flex-col items-center gap-1" onclick="goHome()" style="color:var(--teal);border:none;background:none;cursor:pointer">
+      <i class="fas fa-search text-lg"></i><span class="text-xs font-semibold">Analyse</span>
+    </button>
+    <button class="flex flex-col items-center gap-1" id="mb-res" onclick="showPg('results')" style="color:var(--text-muted);border:none;background:none;cursor:pointer;display:none">
+      <i class="fas fa-chart-bar text-lg"></i><span class="text-xs font-semibold">Results</span>
+    </button>
+    <button class="flex flex-col items-center gap-1" onclick="showPg('how')" style="color:var(--text-muted);border:none;background:none;cursor:pointer">
+      <i class="fas fa-info-circle text-lg"></i><span class="text-xs font-semibold">How</span>
+    </button>
+  </div>
+</nav>
+
+<script>
+let currentUser = null, cvMode = 'up', cvFile = null;
+let activeSessionId = null;
+
+// ── AUTH ──
+function doRegister() {
+  const fn=v('r-fn'),ln=v('r-ln'),em=v('r-em'),pw=document.getElementById('r-pw').value,pw2=document.getElementById('r-pw2').value;
+  hide('r-err');
+  if(!fn||!ln||!em||!pw){return setErr('r-err','Please fill in all fields.')}
+  if(pw.length<8){return setErr('r-err','Password must be at least 8 characters.')}
+  if(pw!==pw2){return setErr('r-err','Passwords do not match.')}
+  const users=getUsers();
+  if(users[em]){return setErr('r-err','An account with this email already exists.')}
+  users[em]={firstName:fn,lastName:ln,email:em,password:btoa(pw)};
+  localStorage.setItem('sb_users',JSON.stringify(users));
+  loginUser({firstName:fn,lastName:ln,email:em});
+}
+function doLogin() {
+  const em=v('l-em'),pw=document.getElementById('l-pw').value;
+  hide('l-err');
+  const users=getUsers();
+  if(!users[em]||atob(users[em].password)!==pw){return setErr('l-err','Invalid email or password.')}
+  loginUser(users[em]);
+}
+function loginUser(u){currentUser=u;localStorage.setItem('sb_current',JSON.stringify(u));updateNav();showPg('home')}
+function logout(){currentUser=null;localStorage.removeItem('sb_current');updateNav();showPg('login')}
+function updateNav(){
+  const nu=document.getElementById('nav-user'),na=document.getElementById('nav-auth');
+  if(currentUser){nu.classList.remove('hidden');nu.classList.add('flex');na.classList.add('hidden');document.getElementById('nav-av').textContent=currentUser.firstName[0].toUpperCase()}
+  else{nu.classList.add('hidden');nu.classList.remove('flex');na.classList.remove('hidden')}
+}
+function getUsers(){return JSON.parse(localStorage.getItem('sb_users')||'{}')}
+function v(id){return document.getElementById(id).value.trim()}
+function setErr(id,msg){const el=document.getElementById(id);el.textContent=msg;el.classList.remove('hidden')}
+function hide(id){document.getElementById(id).classList.add('hidden')}
+
+// ── PASSWORD ──
+function togglePw(id,eid){const i=document.getElementById(id),s=i.type==='password';i.type=s?'text':'password';document.getElementById(eid).className=s?'fas fa-eye-slash':'fas fa-eye'}
+function checkPw(pw){
+  let s=0;if(pw.length>=8)s++;if(/[A-Z]/.test(pw))s++;if(/[0-9]/.test(pw))s++;if(/[^A-Za-z0-9]/.test(pw))s++;
+  const cols=['#ef4444','#3b82f6','#3b82f6','#10b981'],lbls=['','Weak','Fair','Good','Strong'];
+  ['pw1','pw2','pw3','pw4'].forEach((b,i)=>{document.getElementById(b).style.background=i<s?cols[s-1]:'rgba(255,255,255,0.08)'});
+  const pl=document.getElementById('pwl');pl.textContent=lbls[s]||'';pl.style.color=s>0?cols[s-1]:'var(--text-muted)';
+}
+
+// ── THEME (light/dark) ──
+let isDark = true;
+function toggleTheme(){
+  isDark=!isDark;
+  document.getElementById('tog').classList.toggle('light',!isDark);
+  document.getElementById('ti').className=isDark?'fas fa-moon text-white':'fas fa-sun text-white';
+  document.body.classList.toggle('light',!isDark);
+  document.body.style.background='';
+  document.body.style.color='';
+  localStorage.setItem('sb_theme',isDark?'dark':'light');
+}
+
+// ── PAGES ──
+function showPg(n){
+  document.querySelectorAll('.pg,.pg-center').forEach(p=>p.classList.remove('on'));
+  const el=document.getElementById('pg-'+n);
+  el.classList.add('on');
+  document.querySelectorAll('.tab[id^="nt-"]').forEach(t=>t.classList.remove('on'));
+  const nt=document.getElementById('nt-'+n);if(nt)nt.classList.add('on');
+  window.scrollTo(0,0);
+}
+function goHome(){showPg('home');const t=document.getElementById('nt-home');if(t)t.classList.add('on')}
+
+// ── CV TAB ──
+function swTab(t){
+  cvMode=t;
+  document.getElementById('s-up').classList.toggle('hidden',t!=='up');
+  document.getElementById('s-paste').classList.toggle('hidden',t!=='paste');
+  document.getElementById('t-up').classList.toggle('on',t==='up');
+  document.getElementById('t-paste').classList.toggle('on',t==='paste');
+}
+
+// ── FILE ──
+function handleDrop(e){e.preventDefault();document.getElementById('dz').classList.remove('drag');if(e.dataTransfer.files[0])setFile(e.dataTransfer.files[0])}
+function handleFile(e){if(e.target.files[0])setFile(e.target.files[0])}
+function setFile(f){
+  cvFile=f;
+  document.getElementById('dz-def').classList.add('hidden');
+  document.getElementById('dz-done').classList.remove('hidden');
+  document.getElementById('fn').textContent=f.name;
+  document.getElementById('fs').textContent=(f.size/1024).toFixed(0)+' KB · Ready to analyse';
+}
+function clearFile(e){
+  e.stopPropagation();cvFile=null;
+  document.getElementById('dz-def').classList.remove('hidden');
+  document.getElementById('dz-done').classList.add('hidden');
+  document.getElementById('cf').value='';
+}
+
+// ── LOADING ──
+const lmsgs=['Parsing your CV...','Identifying your skills...','Analysing job requirements...','Calculating skill gaps...','Building learning roadmap...','Finding the best resources...','Generating career advice...','Crafting CV improvement tips...','Almost done...'];
+let lInt;
+function startLoading(){let i=0;document.getElementById('ls').textContent=lmsgs[0];lInt=setInterval(()=>{i=Math.min(i+1,lmsgs.length-1);document.getElementById('ls').textContent=lmsgs[i]},2200)}
+function stopLoading(){clearInterval(lInt)}
+
+// ── ANALYSIS ──
+async function runAnalysis(){
+  const jd=document.getElementById('jd').value.trim(),jt=document.getElementById('jt').value.trim();
+  if(!jd&&!jt){showErrBox('Please enter a job title or paste a job description.');return}
+  hideErrBox();showPg('loading');startLoading();
+  document.getElementById('ab').disabled=true;
+  try{
+    const API=(()=>{
+      const h=window.location.hostname;
+      // Live Server (127.0.0.1) / file:// should still call Flask on 5000
+      if(window.location.protocol==='file:'||!h||h==='localhost'||h==='127.0.0.1'||h==='::1') return 'http://localhost:5000';
+      // If page is served by Flask, same-origin relative routes work.
+      return '';
+    })();
+
+    // If we have a session (resume + JD already stored server-side), analyse with interview answers
+    if(activeSessionId){
+      const res=await fetch(API+'/api/analyse_session',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({session_id:activeSessionId})
+      });
+      const ct=(res.headers.get('content-type')||'').toLowerCase();
+      if(!ct.includes('application/json')){
+        const t=await res.text();
+        throw new Error('Server returned non-JSON (likely wrong URL). First bytes: '+t.slice(0,60));
+      }
+      const data=await res.json();
+      if(!res.ok||data.error)throw new Error(data.error||'Server error');
+      stopLoading();renderResults(data);
+      document.getElementById('nt-results').style.display='block';
+      document.getElementById('mb-res').style.display='flex';
+      showPg('results');
+      showNotif('Analysis complete!','success');
+      return;
+    }
+
+    // Backwards-compatible: direct analysis without interview flow
+    const fd=new FormData();
+    fd.append('job_description',jd);fd.append('job_title',jt);
+    if(cvMode==='up'&&cvFile)fd.append('cv_file',cvFile);
+    else if(cvMode==='paste')fd.append('cv_text',document.getElementById('cv-txt').value);
+    const res=await fetch(API+'/api/analyse',{method:'POST',body:fd});
+    const ct=(res.headers.get('content-type')||'').toLowerCase();
+    if(!ct.includes('application/json')){
+      const t=await res.text();
+      throw new Error('Server returned non-JSON (likely wrong URL). First bytes: '+t.slice(0,60));
+    }
+    const data=await res.json();
+    if(!res.ok||data.error)throw new Error(data.error||'Server error');
+    stopLoading();renderResults(data);
+    document.getElementById('nt-results').style.display='block';
+    document.getElementById('mb-res').style.display='flex';
+    showPg('results');
+    showNotif('Analysis complete!','success');
+  }catch(err){
+    stopLoading();showPg('home');
+    showErrBox('Error: '+err.message+'. Is app.py running?');
+    console.error(err);
+  }finally{
+    document.getElementById('ab').disabled=false;
+  }
+}
+
+async function startConversation(){
+  const jd=document.getElementById('jd').value.trim(),jt=document.getElementById('jt').value.trim();
+  if(!jd&&!jt){showErrBox('Please enter a job title or paste a job description.');return}
+  if(cvMode==='up'&&!cvFile){showErrBox('Please upload your CV/resume file first.');return}
+  if(cvMode==='paste'&&!document.getElementById('cv-txt').value.trim()){showErrBox('Please paste your CV/resume text first.');return}
+
+  hideErrBox();
+  const API=(()=>{
+    const h=window.location.hostname;
+    if(window.location.protocol==='file:'||!h||h==='localhost'||h==='127.0.0.1'||h==='::1') return 'http://localhost:5000';
+    return '';
+  })();
+
+  document.getElementById('cb').disabled=true;
+  try{
+    const fd=new FormData();
+    fd.append('job_description',jd);fd.append('job_title',jt);
+    if(cvMode==='up'&&cvFile)fd.append('cv_file',cvFile);
+    else if(cvMode==='paste')fd.append('cv_text',document.getElementById('cv-txt').value);
+    const res=await fetch(API+'/api/session/start',{method:'POST',body:fd});
+    const data=await res.json();
+    if(!res.ok||data.error)throw new Error(data.error||'Server error');
+    const sid=data.session_id;
+    window.location.href='interview.html?sid='+encodeURIComponent(sid);
+  }catch(err){
+    showErrBox('Error: '+err.message+'. Is app.py running?');
+    console.error(err);
+  }finally{
+    document.getElementById('cb').disabled=false;
+  }
+}
+function showErrBox(m){document.getElementById('em').textContent=m;document.getElementById('err').classList.remove('hidden')}
+function hideErrBox(){document.getElementById('err').classList.add('hidden')}
+
+// ── NOTIFICATION ──
+function showNotif(msg,type='info'){
+  const colors={success:'border-green-500/30',error:'border-red-500/30 bg-red-500/5',info:'border-teal-500/30'};
+  const icons={success:'fa-check-circle text-green-400',error:'fa-exclamation-circle text-red-400',info:'fa-info-circle text-teal-400'};
+  const el=document.createElement('div');
+  el.className=`notif ${colors[type]||colors.info}`;
+  el.innerHTML=`<div class="flex items-center gap-3"><i class="fas ${icons[type]||icons.info}"></i><p class="text-sm font-medium">${msg}</p></div>`;
+  document.body.appendChild(el);
+  setTimeout(()=>{el.style.animation='slideIn 0.3s ease-out reverse';setTimeout(()=>el.remove(),300)},3000);
+}
+
+// ── RENDER RESULTS ──
+function renderResults(d){
+  const match=d.overall_match||0,circ=251;
+  const mc=match>=75?'var(--green)':match>=50?'var(--blue)':'var(--red)';
+  const ml=match>=75?'Strong Match':match>=50?'Moderate Match':'Needs Work';
+  const mb=match>=75?'bdg-green':match>=50?'bdg-blue':'bdg-red';
+
+  function rtIc(t){return{course:'graduation-cap',book:'book',youtube:'youtube',project:'code',certification:'certificate',practice:'dumbbell'}[t]||'link'}
+  function rtC(t){return{course:'var(--blue)',book:'var(--teal)',youtube:'var(--red)',project:'var(--green)',certification:'var(--teal)',practice:'var(--blue)'}[t]||'var(--teal)'}
+  function impB(i){const m={critical:'imp-c Critical',important:'imp-i Important','nice-to-have':'imp-n Nice to have'};return`<span class="bdg ${m[i]||'imp-n Nice to have'}"></span>`}
+
+  document.getElementById('rc').innerHTML=`
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+    <div>
+      <div class="flex flex-wrap items-center gap-2 mb-2">
+        <span class="bdg bdg-teal">${d.industry||'Career'}</span>
+        <span class="bdg ${mb}">${ml}</span>
+      </div>
+      <h2 class="font-bold tracking-tight" style="font-size:2rem;letter-spacing:-1px">${d.job_title||'Career Gap Analysis'}</h2>
+      <p class="mt-2 leading-relaxed text-sm" style="color:var(--text-muted)">${d.summary||''}</p>
+    </div>
+    <button class="btn btn-ghost flex-shrink-0" onclick="goHome()"><i class="fas fa-redo mr-2"></i>New Analysis</button>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+    <div class="glass p-5 flex items-center gap-4 col-span-2 sm:col-span-1">
+      <div class="relative w-16 h-16 flex-shrink-0">
+        <svg class="ring-svg w-16 h-16"><circle cx="32" cy="32" r="20" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="4"/><circle class="ring-circle" id="mr" cx="32" cy="32" r="20" fill="none" stroke="${mc}" stroke-width="4" stroke-linecap="round"/></svg>
+        <div class="absolute inset-0 flex items-center justify-center"><span class="font-bold text-sm">${match}%</span></div>
+      </div>
+      <div><p class="font-bold text-2xl">${match}%</p><p class="text-xs" style="color:var(--text-muted)">Overall Match</p></div>
+    </div>
+    <div class="glass p-5"><div class="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style="background:var(--green-dim)"><i class="fas fa-check text-sm" style="color:var(--green)"></i></div><p class="font-bold text-3xl">${(d.strengths||[]).length}</p><p class="text-xs mt-1" style="color:var(--text-muted)">Strengths</p></div>
+    <div class="glass p-5"><div class="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style="background:var(--red-dim)"><i class="fas fa-exclamation text-sm" style="color:var(--red)"></i></div><p class="font-bold text-3xl">${(d.gaps||[]).length}</p><p class="text-xs mt-1" style="color:var(--text-muted)">Gaps</p></div>
+    <div class="glass p-5"><div class="w-9 h-9 rounded-xl flex items-center justify-center mb-3" style="background:var(--teal-dim)"><i class="fas fa-map text-sm" style="color:var(--teal)"></i></div><p class="font-bold text-3xl">${(d.roadmap||[]).length}</p><p class="text-xs mt-1" style="color:var(--text-muted)">Roadmap steps</p></div>
+  </div>
+
+  <!-- Salary + Experience -->
+  <div class="grid sm:grid-cols-2 gap-4 mb-5">
+    ${d.salary_insight?`
+    <div class="glass p-6">
+      <div class="sec-h"><div class="sec-ic" style="background:var(--green-dim)"><i class="fas fa-coins text-xs" style="color:var(--green)"></i></div>Salary Insight</div>
+      <p class="font-bold mb-3" style="font-size:1.75rem;color:var(--green)">${d.salary_insight.range||'Varies'}</p>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="p-3 rounded-xl text-center" style="background:rgba(255,255,255,0.04)"><p class="text-xs mb-1 uppercase tracking-wide" style="color:var(--text-muted)">Entry</p><p class="font-semibold text-sm">${d.salary_insight.entry||'—'}</p></div>
+        <div class="p-3 rounded-xl text-center" style="background:rgba(255,255,255,0.04)"><p class="text-xs mb-1 uppercase tracking-wide" style="color:var(--text-muted)">Senior</p><p class="font-semibold text-sm">${d.salary_insight.senior||'—'}</p></div>
+      </div>
+      ${d.salary_insight.note?`<p class="text-xs mt-3 leading-relaxed" style="color:var(--text-muted)">${d.salary_insight.note}</p>`:''}
+    </div>`:''}
+    ${d.experience_advice?`
+    <div class="glass p-6">
+      <div class="sec-h"><div class="sec-ic" style="background:var(--blue-dim)"><i class="fas fa-briefcase text-xs" style="color:var(--blue)"></i></div>Experience</div>
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        <div class="p-3 rounded-xl text-center" style="background:rgba(255,255,255,0.04)"><p class="text-xs mb-1 uppercase tracking-wide" style="color:var(--text-muted)">Required</p><p class="font-semibold text-sm" style="color:var(--teal)">${d.experience_advice.years_needed||'N/A'}</p></div>
+        <div class="p-3 rounded-xl text-center" style="background:rgba(255,255,255,0.04)"><p class="text-xs mb-1 uppercase tracking-wide" style="color:var(--text-muted)">Your estimate</p><p class="font-semibold text-sm">${d.experience_advice.current_estimate||'Unknown'}</p></div>
+      </div>
+      <p class="text-sm leading-relaxed" style="color:var(--text-muted)">${d.experience_advice.advice||''}</p>
+    </div>`:''}
+  </div>
+
+  <!-- Strengths + Gaps -->
+  <div class="grid lg:grid-cols-2 gap-4 mb-5">
+    <div class="glass p-6">
+      <div class="sec-h"><div class="sec-ic" style="background:var(--green-dim)"><i class="fas fa-star text-xs" style="color:var(--green)"></i></div>Your Strengths</div>
+      <div class="space-y-5">
+        ${(d.strengths||[]).map(s=>`
+        <div>
+          <div class="flex items-center justify-between mb-2"><span class="text-sm font-semibold">${s.skill}</span><span class="text-sm font-bold" style="color:var(--teal)">${s.level}%</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:0%" data-w="${s.level}%"></div></div>
+          ${s.note?`<p class="text-xs mt-1.5 leading-relaxed" style="color:var(--text-muted)">${s.note}</p>`:''}
+        </div>`).join('')}
+        ${!(d.strengths||[]).length?'<p class="text-sm" style="color:var(--text-muted)">Upload your CV for a detailed strengths analysis.</p>':''}
+      </div>
+    </div>
+    <div class="glass p-6">
+      <div class="sec-h"><div class="sec-ic" style="background:var(--red-dim)"><i class="fas fa-exclamation-circle text-xs" style="color:var(--red)"></i></div>Skill Gaps</div>
+      <div class="space-y-3">
+        ${(d.gaps||[]).map(g=>`
+        <div class="p-4 rounded-xl" style="background:rgba(255,255,255,0.03);border:1px solid var(--border)">
+          <div class="flex items-center justify-between mb-1">${impB(g.importance)}<span class="text-sm font-semibold">${g.skill}</span></div>
+          ${g.note?`<p class="text-xs leading-relaxed mt-1" style="color:var(--text-muted)">${g.note}</p>`:''}
+        </div>`).join('')}
+        ${!(d.gaps||[]).length?'<p class="text-sm" style="color:var(--green)">No significant gaps — you are a strong match!</p>':''}
+      </div>
+    </div>
+  </div>
+
+  <!-- Roadmap -->
+  <div class="glass p-6 mb-5">
+    <div class="sec-h"><div class="sec-ic" style="background:var(--teal-dim)"><i class="fas fa-map text-xs" style="color:var(--teal)"></i></div>Your Learning Roadmap</div>
+    <div class="relative space-y-7">
+      <div class="tl-line"></div>
+      ${(d.roadmap||[]).map((s,i)=>`
+      <div class="flex gap-4 items-start">
+        <div class="tl-dot">${s.step||i+1}</div>
+        <div class="flex-1 pb-1">
+          <div class="flex flex-wrap items-center gap-2 mb-1">
+            <h4 class="font-bold text-base">${s.title}</h4>
+            ${s.duration?`<span class="bdg bdg-teal"><i class="fas fa-clock mr-1"></i>${s.duration}</span>`:''}
+          </div>
+          ${s.why?`<p class="text-sm mb-3 leading-relaxed" style="color:var(--text-muted)">${s.why}</p>`:''}
+          ${(s.resources||[]).length?`
+          <div class="space-y-2">
+            ${s.resources.map(r=>`
+            <div class="flex items-center gap-3 p-3 rounded-xl" style="background:rgba(255,255,255,0.03);border:1px solid var(--border)">
+              <i class="fas fa-${rtIc(r.type)} text-sm flex-shrink-0" style="color:${rtC(r.type)}"></i>
+              <div class="flex-1 min-w-0">
+                ${r.url?`<a href="${r.url}" target="_blank" class="text-sm font-semibold hover:underline" style="color:var(--teal)">${r.name}</a>`:`<span class="text-sm font-semibold">${r.name}</span>`}
+                ${r.note?`<p class="text-xs truncate leading-relaxed" style="color:var(--text-muted)">${r.note}</p>`:''}
+              </div>
+              <span class="bdg flex-shrink-0 ${r.free?'bdg-green':'bdg-blue'}">${r.free?'Free':'Paid'}</span>
+            </div>`).join('')}
+          </div>`:''}
+        </div>
+      </div>`).join('')}
+    </div>
+  </div>
+
+  <!-- Career Advice + Next Steps -->
+  <div class="grid lg:grid-cols-2 gap-4 mb-5">
+    <div class="glass p-6">
+      <div class="sec-h"><div class="sec-ic" style="background:var(--blue-dim)"><i class="fas fa-lightbulb text-xs" style="color:var(--blue)"></i></div>Career Advice</div>
+      <div class="space-y-3">
+        ${(d.career_advice||[]).map((t,i)=>`
+        <div class="flex gap-3 p-4 rounded-xl" style="background:rgba(255,255,255,0.03);border:1px solid var(--border)">
+          <div class="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold" style="background:var(--blue-dim);color:var(--blue)">${i+1}</div>
+          <p class="text-sm leading-relaxed" style="color:var(--text-muted)">${t}</p>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="glass p-6">
+      <div class="sec-h"><div class="sec-ic" style="background:var(--teal-dim)"><i class="fas fa-rocket text-xs" style="color:var(--teal)"></i></div>Do This Week</div>
+      <div class="space-y-3">
+        ${(d.next_steps||[]).map(s=>`
+        <div class="flex gap-3 items-start p-4 rounded-xl" style="background:var(--teal-dim);border:1px solid var(--border-teal)">
+          <i class="fas fa-arrow-right mt-0.5 flex-shrink-0 text-sm" style="color:var(--teal)"></i>
+          <p class="text-sm leading-relaxed">${s}</p>
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- CV Advice -->
+  ${(d.cv_advice||[]).length?`
+  <div class="glass p-6 mb-5" style="border-color:var(--border-teal)">
+    <div class="sec-h"><div class="sec-ic" style="background:var(--teal-dim)"><i class="fas fa-file-pen text-xs" style="color:var(--teal)"></i></div>How to Strengthen Your CV</div>
+    <p class="text-sm mb-5 leading-relaxed" style="color:var(--text-muted)">Specific improvements to make your application stand out for this role:</p>
+    <div class="space-y-3">
+      ${d.cv_advice.map((tip,i)=>`
+      <div class="cv-tip">
+        <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 text-xs font-bold" style="background:var(--teal-dim);color:var(--teal)">${i+1}</div>
+        <p class="text-sm leading-relaxed">${tip}</p>
+      </div>`).join('')}
+    </div>
+  </div>`:''}
+
+  <!-- Alternative Roles -->
+  ${(d.alternative_roles||[]).length?`
+  <div class="glass p-6">
+    <div class="sec-h"><div class="sec-ic" style="background:var(--blue-dim)"><i class="fas fa-code-branch text-xs" style="color:var(--blue)"></i></div>Alternative Roles You Might Suit</div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      ${d.alternative_roles.map(r=>`
+      <div class="p-4 rounded-xl" style="background:rgba(255,255,255,0.03);border:1px solid var(--border);transition:border-color 0.2s" onmouseover="this.style.borderColor='var(--border-teal)'" onmouseout="this.style.borderColor='var(--border)'">
+        <div class="flex items-center justify-between mb-2">
+          <p class="font-semibold text-sm">${r.title}</p>
+          <span class="bdg ${r.match>=75?'bdg-green':r.match>=50?'bdg-blue':'bdg-teal'}">${r.match}%</span>
+        </div>
+        <p class="text-xs leading-relaxed" style="color:var(--text-muted)">${r.reason}</p>
+      </div>`).join('')}
+    </div>
+  </div>`:''}
+  `;
+
+  setTimeout(()=>{
+    document.querySelectorAll('.bar-fill[data-w]').forEach(b=>{b.style.width=b.getAttribute('data-w')});
+    const ring=document.getElementById('mr');
+    if(ring)ring.style.strokeDashoffset=String(circ-(circ*match/100));
+  },300);
+}
+
+// ── INIT ──
+window.addEventListener('load',()=>{
+  const t=localStorage.getItem('sb_theme');
+  if(t==='light'){isDark=false;document.getElementById('tog').classList.add('light');document.getElementById('ti').className='fas fa-sun text-white';document.body.classList.add('light');document.body.style.background='';document.body.style.color=''}
+  const u=localStorage.getItem('sb_current');
+  if(u){currentUser=JSON.parse(u);updateNav()}
+
+  // Interview redirect support
+  const p=new URLSearchParams(window.location.search);
+  const sid=p.get('sid');
+  const interviewDone=p.get('interview');
+  const autoView=p.get('autoview');
+  if(sid){
+    activeSessionId=sid;
+    if(interviewDone){
+      document.getElementById('ab').classList.remove('hidden');
+      document.getElementById('cb').classList.add('hidden');
+      showNotif('Interview saved — you can analyse now.','success');
+      // remove query params for cleaner refresh
+      history.replaceState({}, document.title, 'index.html');
+    }
+  }
+
+  // If interview page already ran analysis, render results immediately
+  if(autoView){
+    try{
+      const raw=sessionStorage.getItem('sb_analysis_result');
+      if(raw){
+        const d=JSON.parse(raw);
+        sessionStorage.removeItem('sb_analysis_result');
+        renderResults(d);
+        document.getElementById('nt-results').style.display='block';
+        document.getElementById('mb-res').style.display='flex';
+        showPg('results');
+        showNotif('Analysis complete!','success');
+      }
+    }catch(e){}
+    history.replaceState({}, document.title, 'index.html');
+  }
+});
+</script>
+</body>
+</html>

@@ -242,14 +242,3 @@ pip install -r requirements.txt
 - [ ] Email delivery of analysis results
 - [ ] CV rewrite assistant — full AI-powered CV editor
 
----
-
-## Disclaimer
-
-> ⚠️ SkillBridge is an AI-assisted career tool intended to **support and inform** job seekers. It does not guarantee employment outcomes. All AI-generated advice should be critically reviewed and adapted to your personal circumstances. Salary figures are estimates based on AI knowledge and may not reflect current market rates in your region.
-
----
-
-
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/angel-egwaoje-416927280)
-[![GitHub](https://img.shields.io/badge/GitHub-Follow-black?style=flat-square&logo=github)](https://github.com/egwaojeangel)
